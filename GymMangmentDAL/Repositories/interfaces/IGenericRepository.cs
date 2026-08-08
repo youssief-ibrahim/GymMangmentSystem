@@ -7,13 +7,12 @@ using GymMangmentDAL.Entities;
 
 namespace GymMangmentDAL.Repositories.interfaces
 {
-    internal interface IGenericRepository<T> where T : BaseEntity,new()
+    public interface IGenericRepository<T> where T : BaseEntity,new()
     {
-        IEnumerable<T> GetAll();
-        T? GetById(int Id);
-        void Add(T member);
-        void Update(T member);
-        void Delete(T Id);
-        void save();
+        public IEnumerable<T> GetAll(Func<T,bool>? condition=null);
+        public T? GetById(int Id);
+        public int Add(T member);
+        public int Update(T member);
+        public int Delete(T Id);
     }
 }

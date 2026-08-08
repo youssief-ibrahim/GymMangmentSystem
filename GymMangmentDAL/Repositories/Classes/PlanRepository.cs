@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GymMangmentDAL.Repositories.Classes
 {
-    internal class PlanRepository : IPlanRepository
+    public class PlanRepository : IPlanRepository
     {
         private readonly GymDbContext context;
         public PlanRepository(GymDbContext context)
@@ -27,13 +27,11 @@ namespace GymMangmentDAL.Repositories.Classes
             return context.Plans.Find(Id);
         }
 
-        public void Update(Plan member)
+        public int Update(Plan member)
         {
              context.Plans.Update(member);
+            return context.SaveChanges();
         }
-        public void Save()
-        {
-            context.SaveChanges();
-        }
+      
     }
 }

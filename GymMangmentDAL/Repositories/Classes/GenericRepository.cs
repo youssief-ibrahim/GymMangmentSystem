@@ -10,40 +10,40 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GymMangmentDAL.Repositories.Classes
 {
-    internal class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity, new()
+    public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity, new()
     {
         private readonly GymDbContext context;
         public GenericRepository(GymDbContext context)
         {
             this.context = context;
         }
-        public void Add(T entity)
+        public int Add(T entity)
         {
             context.Set<T>().Add(entity);
+            return context.SaveChanges();
         }
 
-        public void Delete(T entity)
+        public int Delete(T entity)
         {
             context.Set<T>().Remove(entity);
+            return context.SaveChanges();
         }
 
-        public IEnumerable<T> GetAll()
+        public IEnumerable<T> GetAll(Func<T, bool>? condition = null)
         {
-           return context.Set<T>().AsNoTracking().ToList();
+            if (condition is null) return context.Set<T>().AsNoTracking().ToList();
+            else return context.Set<T>().AsNoTracking().Where(condition).ToList();
         }
-
+ 
         public T? GetById(int Id)
         {
             return context.Set<T>().Find(Id);
         }
 
-        public void Update(T entity)
+        public int Update(T entity)
         {
            context.Set<T>().Update(entity);
-        }
-        public void save()
-        {
-            context.SaveChanges();
+            return context.SaveChanges();
         }
 
     }

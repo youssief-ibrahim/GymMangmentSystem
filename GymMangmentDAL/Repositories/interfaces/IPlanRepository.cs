@@ -7,11 +7,10 @@ using GymMangmentDAL.Entities;
 
 namespace GymMangmentDAL.Repositories.interfaces
 {
-    internal interface IPlanRepository
+    public interface IPlanRepository
     {
         IEnumerable<Plan> GetAll();
         Plan? GetById(int Id);
-        void Update(Plan member);
-        void Save();
+        int Update(Plan member);
     }
 }
