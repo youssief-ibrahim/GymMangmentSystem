@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using GymMangmentBLL.ViewModels.MemberViewModel;
+using GymMangmentBLL.ViewModels.PlanViewModel;
+
+namespace GymMangmentBLL.Services.InterFaces
+{
+    internal interface IPlanService
+    {
+        IEnumerable<PlanViewModel> GetAllMembers();
+        PlanViewModel? GetPlanById(int PlanId);
+        UpdatePlanViewModel? GetPlanForUpdate(int PlanId);
+        bool UpdatePlan(int PlanId, UpdatePlanViewModel updatePlanViewModel);
+        bool TogglePlanStatus(int PlanId);
+    }
+}

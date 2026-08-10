@@ -12,19 +12,25 @@ namespace GymMangmentBLL.Services.Classes
 {
     internal class MemberService : IMemberService
     {
-        private readonly IGenericRepository<Member> memberReposatoriy;
-        private readonly IPlanRepository planRepository;
-        private readonly IGenericRepository<MemberShip> membershipreposatory;
-        private readonly IGenericRepository<HealthRecord> healthRecordReposatory;
-        private readonly IGenericRepository<MemberSession> memberSessionReposatory;
 
-        public MemberService(IGenericRepository<Member> memberReposatoriy,IPlanRepository planRepository,IGenericRepository<MemberShip> membershipreposatory,IGenericRepository<HealthRecord>healthRecordReposatory,IGenericRepository<MemberSession>memberSessionReposatory)
+        //private readonly IGenericRepository<Member> memberReposatoriy;
+        //private readonly IPlanRepository planRepository;
+        //private readonly IGenericRepository<MemberShip> membershipreposatory;
+        //private readonly IGenericRepository<HealthRecord> healthRecordReposatory;
+        //private readonly IGenericRepository<MemberSession> memberSessionReposatory;
+
+        //public MemberService(IGenericRepository<Member> memberReposatoriy,IPlanRepository planRepository,IGenericRepository<MemberShip> membershipreposatory,IGenericRepository<HealthRecord>healthRecordReposatory,IGenericRepository<MemberSession>memberSessionReposatory)
+        //{
+        //    this.memberReposatoriy = memberReposatoriy;
+        //    this.planRepository = planRepository;
+        //    this.membershipreposatory = membershipreposatory;
+        //    this.healthRecordReposatory = healthRecordReposatory;
+        //    this.memberSessionReposatory = memberSessionReposatory;
+        //}
+        private readonly IUnitOfWork unitOfWork;
+        public MemberService(IUnitOfWork UnitOfWork)
         {
-            this.memberReposatoriy = memberReposatoriy;
-            this.planRepository = planRepository;
-            this.membershipreposatory = membershipreposatory;
-            this.healthRecordReposatory = healthRecordReposatory;
-            this.memberSessionReposatory = memberSessionReposatory;
+            unitOfWork = UnitOfWork;
         }
 
         public bool CreateMember(CreateMemberViewModel createMemberViewModel)
@@ -59,8 +65,8 @@ namespace GymMangmentBLL.Services.Classes
                         Note = createMemberViewModel.HealthRecordViewModel.Note
                     }
                 };
-              return memberReposatoriy.Add(member)>0;
-                
+                unitOfWork.GetRepository<Member>().Add(member);
+                return unitOfWork.SaveChanges()>0;
             }
             catch (Exception ex)
             {
@@ -71,7 +77,7 @@ namespace GymMangmentBLL.Services.Classes
 
         public IEnumerable<MemberViewModels> GetAllMembers()
         {
-            var member = memberReposatoriy.GetAll();
+            var member = unitOfWork.GetRepository<Member>().GetAll();
             if (member is null || !member.Any()) return [];
             var MemberViewModels = member.Select(x => new MemberViewModels
             {
@@ -87,7 +93,7 @@ namespace GymMangmentBLL.Services.Classes
 
         public MemberViewModels? GetMemberDetails(int MemberId)
         {
-            var member = memberReposatoriy.GetById(MemberId);
+            var member = unitOfWork.GetRepository<Member>().GetById(MemberId);
             if (member is null)  return null;
             var ViewModel = new MemberViewModels()
             {
@@ -99,12 +105,12 @@ namespace GymMangmentBLL.Services.Classes
                 Address = $"{member.Address.BuildingNumber} - {member.Address.Street} - {member.Address.City}",
                 Photo = member.Photo,
             };
-            var ActiveMembership = membershipreposatory.GetAll(ms => ms.MemberId == MemberId && ms.Status=="Active").FirstOrDefault();
+            var ActiveMembership = unitOfWork.GetRepository<MemberShip>().GetAll(ms => ms.MemberId == MemberId && ms.Status=="Active").FirstOrDefault();
             if (ActiveMembership is not null)
             {
                 ViewModel.MembershipStart = ActiveMembership.CreatedAt.ToShortDateString();
                 ViewModel.MembershipEnd = ActiveMembership.EndDate.ToShortDateString();
-                var plan =planRepository.GetById(ActiveMembership.PlanId);
+                var plan = unitOfWork.GetRepository<Plan>().GetById(ActiveMembership.PlanId);
                 ViewModel.PlanName = plan?.Name;
             }
             return ViewModel;
@@ -113,7 +119,7 @@ namespace GymMangmentBLL.Services.Classes
 
         public MemberToUpdateViewModel? GetMemberForUpdate(int MemberId)
         {
-          var member=memberReposatoriy.GetById(MemberId);
+          var member= unitOfWork.GetRepository<Member>().GetById(MemberId);
             if (member is null) return null;
             var ViewModel = new MemberToUpdateViewModel()
             {
@@ -130,7 +136,7 @@ namespace GymMangmentBLL.Services.Classes
 
         public HealthRecordViewModel? GetMemberHealthRecordDetails(int MemberId)
         {
-            var MemberHealthRecord =healthRecordReposatory.GetById(MemberId);
+            var MemberHealthRecord = unitOfWork.GetRepository<HealthRecord>().GetById(MemberId);
 
             if (MemberHealthRecord is null) return null;
 
@@ -145,19 +151,22 @@ namespace GymMangmentBLL.Services.Classes
 
         public bool RemoveMember(int MemberId)
         {
-            var Member = memberReposatoriy.GetById(MemberId);
+            var membeRepo = unitOfWork.GetRepository<Member>();
+            var Member = membeRepo.GetById(MemberId);
 
             if (Member is null)
                 return false;
 
-            var HasActiveMemberSessions = memberSessionReposatory
+            var HasActiveMemberSessions = unitOfWork.GetRepository<MemberSession>()
                 .GetAll(X => X.MemberId == MemberId &&
                              X.Session.StartDate > DateTime.Now).Any();
 
             if (HasActiveMemberSessions)
                 return false;
 
-            var Memberships = membershipreposatory
+            var memberShipRepo = unitOfWork.GetRepository<MemberShip>();
+
+            var Memberships = memberShipRepo
                 .GetAll(X => X.MemberId == MemberId);
 
             try
@@ -166,11 +175,12 @@ namespace GymMangmentBLL.Services.Classes
                 {
                     foreach (var membership in Memberships)
                     {
-                        membershipreposatory.Delete(membership);
+                        memberShipRepo.Delete(membership);
                     }
                 }
 
-                return memberReposatoriy.Delete(Member) > 0;
+                 membeRepo.Delete(Member) ;
+                return unitOfWork.SaveChanges() > 0;
             }
             catch
             {
@@ -190,7 +200,9 @@ namespace GymMangmentBLL.Services.Classes
 
                 if (IsExistMail(memberToUpdate.Email) || IsExistPhone(memberToUpdate.Phone)) return false;
 
-                var member = memberReposatoriy.GetById(MemberId);
+                var memberRepo = unitOfWork.GetRepository<Member>();
+
+                var member = memberRepo.GetById(MemberId);
                 if (member is null) return false;
 
                 member.Email = memberToUpdate.Email;
@@ -199,7 +211,8 @@ namespace GymMangmentBLL.Services.Classes
                 member.Address.City = memberToUpdate.City;
                 member.Address.City = memberToUpdate.Street;
 
-                return memberReposatoriy.Update(member) > 0;
+                memberRepo.Update(member) ;
+                return unitOfWork.SaveChanges() > 0;
             }
             catch (Exception ex)
             {
@@ -213,11 +226,11 @@ namespace GymMangmentBLL.Services.Classes
         #region private-method
         private bool IsExistMail(string mail)
         {
-           return memberReposatoriy.GetAll(e => e.Email == mail).Any();
+           return unitOfWork.GetRepository<Member>().GetAll(e => e.Email == mail).Any();
         }
         private bool IsExistPhone(string phone)
         {
-            return memberReposatoriy.GetAll(e => e.Phone == phone).Any();
+            return unitOfWork.GetRepository<Member>().GetAll(e => e.Phone == phone).Any();
         }
         #endregion
     }

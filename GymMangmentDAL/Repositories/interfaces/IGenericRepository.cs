@@ -11,8 +11,8 @@ namespace GymMangmentDAL.Repositories.interfaces
     {
         public IEnumerable<T> GetAll(Func<T,bool>? condition=null);
         public T? GetById(int Id);
-        public int Add(T member);
-        public int Update(T member);
-        public int Delete(T Id);
+        public void Add(T member);
+        public void Update(T member);
+        public void Delete(T Id);
     }
 }
