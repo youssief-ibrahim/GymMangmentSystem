@@ -9,10 +9,10 @@ namespace GymMangmentDAL.Repositories.interfaces
 {
     public interface IGenericRepository<T> where T : BaseEntity,new()
     {
-        public IEnumerable<T> GetAll(Func<T,bool>? condition=null);
-        public T? GetById(int Id);
-        public void Add(T member);
-        public void Update(T member);
-        public void Delete(T Id);
+         IEnumerable<T> GetAll(Func<T,bool>? condition=null);
+         T? GetById(int Id);
+         void Add(T member);
+         void Update(T member);
+         void Delete(T Id);
     }
 }
