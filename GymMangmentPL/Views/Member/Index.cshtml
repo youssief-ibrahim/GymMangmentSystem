@@ -2,10 +2,14 @@
 
 @model IEnumerable<MemberViewModels>
 
-@*<div id="Alert" class="alert alert-success alert-dismissible fade show">
+@if(TempData["Success"] is not null)
+{
+<div id="Alert" class="alert alert-success alert-dismissible fade show">
     <i class="bi bi-exclamation-triangle-fill me-2"></i>
     @TempData["ErrorMessage"]
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>*@
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+}
 @if (TempData["Error"] is not null)
 {
     <div id="Alert" class="alert alert-danger alert-dismissible fade show">

@@ -106,7 +106,7 @@ namespace GymMangmentBLL.Services.Classes
             var ActiveMembership = unitOfWork.GetRepository<MemberShip>().GetAll(ms => ms.MemberId == MemberId && ms.Status=="Active").FirstOrDefault();
             if (ActiveMembership is not null)
             {
-                ViewModel.MembershipEndDate = ActiveMembership.CreatedAt.ToShortDateString();
+                ViewModel.MembershipStartDate = ActiveMembership.CreatedAt.ToShortDateString();
                 ViewModel.MembershipEndDate = ActiveMembership.EndDate.ToShortDateString();
                 var plan = unitOfWork.GetRepository<Plan>().GetById(ActiveMembership.PlanId);
                 ViewModel.PlanName = plan?.Name;
@@ -156,11 +156,13 @@ namespace GymMangmentBLL.Services.Classes
             if (Member is null)
                 return false;
 
-            var HasActiveMemberSessions = unitOfWork.GetRepository<MemberSession>()
-                .GetAll(X => X.MemberId == MemberId &&
-                             X.Session.StartDate > DateTime.Now).Any();
+            var SessionsIds = unitOfWork.GetRepository<MemberSession>()
+                .GetAll(X => X.MemberId == MemberId).Select(x=>x.SessionId);
 
-            if (HasActiveMemberSessions)
+            var HasFutreSession = unitOfWork.GetRepository<Session>()
+                 .GetAll(X => SessionsIds.Contains(X.Id) && X.StartDate > DateTime.Now).Any();
+
+            if (HasFutreSession)
                 return false;
 
             var memberShipRepo = unitOfWork.GetRepository<MemberShip>();
@@ -193,11 +195,11 @@ namespace GymMangmentBLL.Services.Classes
             {
 
 
-                //var Emailexist = memberReposatoriy.GetAll(e => e.Email == memberToUpdate.Email).Any();
-                //var Phoneexist = memberReposatoriy.GetAll(e => e.Phone == memberToUpdate.Phone).Any();
+                var Emailexistofupdate = unitOfWork.GetRepository<Member>().GetAll(e => e.Email == memberToUpdate.Email && e.Id!=MemberId).Any();
+                var Phoneexisttoupdate = unitOfWork.GetRepository<Member>().GetAll(e => e.Phone == memberToUpdate.Phone && e.Id != MemberId).Any();
                 //if (Emailexist || Phoneexist) return false;
 
-                if (IsExistMail(memberToUpdate.Email) || IsExistPhone(memberToUpdate.Phone)) return false;
+                if (Emailexistofupdate || Phoneexisttoupdate) return false;
 
                 var memberRepo = unitOfWork.GetRepository<Member>();
 
