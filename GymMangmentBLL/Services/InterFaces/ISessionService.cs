@@ -8,7 +8,7 @@ using GymMangmentBLL.ViewModels.SessionViewModels;
 
 namespace GymMangmentBLL.Services.InterFaces
 {
-    internal interface ISessionService
+    public interface ISessionService
     {
         IEnumerable<SessionViewModel> GeTAllSession();
         SessionViewModel? GetSessionById(int SessionId);

@@ -1,5 +1,8 @@
 using GymMangmentBLL;
+using GymMangmentBLL.Services.Classes;
+using GymMangmentBLL.Services.InterFaces;
 using GymMangmentDAL.Data.Contexts;
+using GymMangmentDAL.Data.DataSeeding;
 using GymMangmentDAL.Repositories.Classes;
 using GymMangmentDAL.Repositories.interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -26,11 +29,17 @@ namespace GymMangmentPL
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddAutoMapper(x => x.AddProfile(new MappingProfile()));
 
+            // servece Conctroll
+
+            builder.Services.AddScoped<IAnalysisService, AnalysisService>();
+            builder.Services.AddScoped<IMemberService, MemberService>();
+
             var app = builder.Build();
             using var scope = app.Services.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<GymDbContext>();
             var pendingMigrations = dbContext.Database.GetPendingMigrations();
             if(pendingMigrations !=null && pendingMigrations.Any()) dbContext.Database.Migrate();
+            GymDbContextSeeding.SeedData(dbContext);
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {

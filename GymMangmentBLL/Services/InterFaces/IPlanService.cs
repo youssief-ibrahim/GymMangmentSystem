@@ -8,7 +8,7 @@ using GymMangmentBLL.ViewModels.PlanViewModel;
 
 namespace GymMangmentBLL.Services.InterFaces
 {
-    internal interface IPlanService
+    public interface IPlanService
     {
         IEnumerable<PlanViewModel> GetAllMembers();
         PlanViewModel? GetPlanById(int PlanId);

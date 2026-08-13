@@ -23,28 +23,29 @@ namespace GymMangmentDAL.Data.DataSeeding
                 if (!HasCategories)
                 {
                     var Categories = LoadDataFromJsonFile<Category>("categories.json");
+                    if(Categories.Any()) 
                     dbContext.Categories.AddRange(Categories);
                 }
 
                 if (!HasPlans)
                 {
                     var Planss = LoadDataFromJsonFile<Plan>("plans.json");
-                    dbContext.Plans.AddRange(Planss);
+                    if (Planss.Any())
+                        dbContext.Plans.AddRange(Planss);
                 }
-
                 int RowsAffected = dbContext.SaveChanges();
                 return RowsAffected > 0;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Seeding Failed : {ex}");
-                return false;
+               return false;
             }
         }
 
         private static List<T> LoadDataFromJsonFile<T>(string fileName)
         {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\Files", fileName);
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot","Files", fileName);
 
             if (!File.Exists(filePath)) throw new FileNotFoundException();
 

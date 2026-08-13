@@ -14,7 +14,7 @@ namespace GymMangmentDAL.Entities
         public Specialist Specialist { get; set; }
         #region Session-Trainer
         public ICollection<Session> TrainerSession { get; set; } = null!;
-
+     
         #endregion
     }
 }

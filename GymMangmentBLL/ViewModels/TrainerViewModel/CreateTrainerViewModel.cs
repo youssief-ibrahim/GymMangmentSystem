@@ -8,7 +8,7 @@ using GymMangmentDAL.Entities.Enums;
 
 namespace GymMangmentBLL.ViewModels.TrainerViewModel
 {
-    internal class CreateTrainerViewModel
+    public class CreateTrainerViewModel
     {
         [Required(ErrorMessage = "Name Is Required")]
         [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Name can only contain letters and spaces")]

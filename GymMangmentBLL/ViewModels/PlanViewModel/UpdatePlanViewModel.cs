@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GymMangmentBLL.ViewModels.PlanViewModel
 {
-    internal class UpdatePlanViewModel
+    public class UpdatePlanViewModel
     {
         [Required(ErrorMessage = "Plan Name Is Required")]
         [StringLength(50, ErrorMessage = "Plan Name Must Be Less Than 50 Char")]
@@ -21,7 +21,7 @@ namespace GymMangmentBLL.ViewModels.PlanViewModel
         [Required(ErrorMessage = "Duration Days Is Required")]
         [Range(1, 365,
             ErrorMessage = "Duration Days Must Be Between 1 and 365")]
-        public int DurationDays { get; set; }
+        public int DurationInDays { get; set; }
 
         [Required(ErrorMessage = "Price Is Required")]
         [Range(0.1, 10000,

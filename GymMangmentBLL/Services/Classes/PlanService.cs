@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using GymMangmentBLL.Services.InterFaces;
 using GymMangmentBLL.ViewModels.PlanViewModel;
 using GymMangmentDAL.Entities;
@@ -11,28 +12,22 @@ using GymMangmentDAL.Repositories.interfaces;
 
 namespace GymMangmentBLL.Services.Classes
 {
-    internal class PlanService : IPlanService
+    public class PlanService : IPlanService
     {
         private readonly IUnitOfWork unitOfWork;
+        private readonly IMapper mapper;
 
-        public PlanService(IUnitOfWork unitOfWork)
+        public PlanService(IUnitOfWork unitOfWork,IMapper mapper)
         {
             this.unitOfWork = unitOfWork;
+            this.mapper = mapper;
         }
         public IEnumerable<PlanViewModel> GetAllMembers()
         {
             var plans=unitOfWork.GetRepository<Plan>().GetAll();
             if (plans == null || !plans.Any()) return [];
 
-            var planVM = plans.Select(e => new PlanViewModel
-            {
-                Id = e.Id,
-                Name = e.Name,
-                Description = e.Description,
-                DurationInDays = e.DurationInDays,
-                IsActive = e.IsActive,
-                Price=e.Price,
-            });
+            var planVM =mapper.Map<IEnumerable<PlanViewModel>>(plans);
             return planVM;
         }
 
@@ -41,15 +36,7 @@ namespace GymMangmentBLL.Services.Classes
             var plan = unitOfWork.GetRepository<Plan>().GetById(PlanId);
             if (plan == null) return null;
 
-            var planVM = new PlanViewModel()
-            {
-                Id = plan.Id,
-                Name = plan.Name,
-                Description = plan.Description,
-                DurationInDays = plan.DurationInDays,
-                IsActive = plan.IsActive,
-                Price = plan.Price,
-            };
+            var planVM = mapper.Map<PlanViewModel>(plan);
             return planVM;
         }
 
@@ -58,13 +45,7 @@ namespace GymMangmentBLL.Services.Classes
             var plan = unitOfWork.GetRepository<Plan>().GetById(PlanId);
             if (plan == null || plan.IsActive==false || HasActivemembershipr((PlanId))) return null;
 
-            return new UpdatePlanViewModel()
-            {
-                Description = plan.Description,
-                DurationDays = plan.DurationInDays,
-                PlanName = plan.Name,
-                Price = plan.Price,
-            };
+            return mapper.Map<UpdatePlanViewModel>(plan);
 
         }
         public bool UpdatePlan(int PlanId, UpdatePlanViewModel updatePlanViewModel)
@@ -73,9 +54,7 @@ namespace GymMangmentBLL.Services.Classes
             if (plan == null || HasActivemembershipr((PlanId))) return false;
             try
             {
-                (plan.Description, plan.Price, plan.DurationInDays, plan.UpdatedAt) =
-                (updatePlanViewModel.Description, updatePlanViewModel.Price, updatePlanViewModel.DurationDays, DateTime.Now);
-
+                mapper.Map(updatePlanViewModel, plan);
                 unitOfWork.GetRepository<Plan>().Update(plan);
                 return unitOfWork.SaveChanges()>0;
             }

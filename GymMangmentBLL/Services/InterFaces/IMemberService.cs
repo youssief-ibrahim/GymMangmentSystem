@@ -8,7 +8,7 @@ using GymMangmentDAL.Entities;
 
 namespace GymMangmentBLL.Services.InterFaces
 {
-    internal interface IMemberService
+    public interface IMemberService
     {
         IEnumerable<MemberViewModels> GetAllMembers();
         bool CreateMember(CreateMemberViewModel createMemberViewModel);

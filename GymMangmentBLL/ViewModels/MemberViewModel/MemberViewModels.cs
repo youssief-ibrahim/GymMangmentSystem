@@ -18,8 +18,8 @@ namespace GymMangmentBLL.ViewModels.MemberViewModel
         // for memberservice to dont make another one we make it nullable in member 
         public string? PlanName { get; set; }
         public string? DateOfBirth { get; set; }
-        public string? MembershipStart { get; set; }
-        public string? MembershipEnd { get; set; }
+        public string? MembershipStartDate { get; set; }
+        public string? MembershipEndDate { get; set; }
         public string? Address { get; set; }
     }
 }

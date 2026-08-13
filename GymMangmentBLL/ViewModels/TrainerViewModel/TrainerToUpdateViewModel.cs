@@ -8,7 +8,7 @@ using GymMangmentDAL.Entities.Enums;
 
 namespace GymMangmentBLL.ViewModels.TrainerViewModel
 {
-    internal class TrainerToUpdateViewModel
+    public class TrainerToUpdateViewModel
     {
         public string Name { get; set; } = null!;
 

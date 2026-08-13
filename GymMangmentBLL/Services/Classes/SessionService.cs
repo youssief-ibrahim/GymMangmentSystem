@@ -13,7 +13,7 @@ using GymMangmentDAL.Repositories.interfaces;
 
 namespace GymMangmentBLL.Services.Classes
 {
-    internal class SessionService : ISessionService
+    public class SessionService : ISessionService
     {
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
