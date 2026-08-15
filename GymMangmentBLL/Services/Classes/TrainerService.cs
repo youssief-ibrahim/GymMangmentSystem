@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.Execution;
 using GymMangmentBLL.Services.InterFaces;
 using GymMangmentBLL.ViewModels.TrainerViewModel;
 using GymMangmentDAL.Entities;
@@ -85,7 +86,12 @@ namespace GymMangmentBLL.Services.Classes
             {
                 var trainerRepo = unitOfWork.GetRepository<Trainer>();
                 var trainer = trainerRepo.GetById(TrainerId);
-                if (trainer is null || IsExistMail(trainer.Email) || IsExistPhone(trainer.Phone)) return false;
+                var Emailexistofupdate = unitOfWork.GetRepository<Trainer>().GetAll(e => e.Email == TrainerToUpdate.Email && e.Id != TrainerId).Any();
+                var Phoneexisttoupdate = unitOfWork.GetRepository<Trainer>().GetAll(e => e.Phone == TrainerToUpdate.Phone && e.Id != TrainerId).Any();
+                //if (Emailexist || Phoneexist) return false;
+
+                if (Emailexistofupdate || Phoneexisttoupdate) return false;
+                if (trainer is null || Emailexistofupdate || Phoneexisttoupdate) return false;
                 mapper.Map( TrainerToUpdate, trainer);
                 trainerRepo.Update(trainer);
                 return unitOfWork.SaveChanges() > 0;

@@ -5,13 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GymMangmentDAL.Entities.Enums;
+using Microsoft.AspNetCore.Http;
 
 namespace GymMangmentBLL.ViewModels.MemberViewModel
 {
     public class CreateMemberViewModel
     {
-        //[Display(Name = "Photo")]
-        //public IFormFile? PhotoFile { get; set; }
+        [Display(Name = "Photo")]
+        public IFormFile? PhotoFile { get; set; }
 
         [Required(ErrorMessage = "Name Is Required!")]
         [StringLength(maximumLength: 50, MinimumLength = 2, ErrorMessage = "Name Must Be Between 2 and 50 Chars!")]

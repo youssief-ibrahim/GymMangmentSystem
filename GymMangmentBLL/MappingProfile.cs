@@ -32,6 +32,9 @@ namespace GymMangmentBLL
             CreateMap<CreateSessionViewModel, Session>();
 
             CreateMap<Session, UpdateSessionViewModel>().ReverseMap();
+            
+            CreateMap<Trainer,TrainerSelectViewModel>();
+            CreateMap<Category,CategorySelectViewModel>();
         }
         private void MapMember()
         {
@@ -45,7 +48,8 @@ namespace GymMangmentBLL
             //}));
             CreateMap<CreateMemberViewModel, Member>()
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src))
-                .ForMember(dest => dest.HealthRecord, opt => opt.MapFrom(src => src.HealthRecordViewModel));
+                .ForMember(dest => dest.HealthRecord, opt => opt.MapFrom(src => src.HealthRecordViewModel))
+                 .ForMember(dest => dest.Photo, opt => opt.Ignore());
 
             CreateMap<CreateMemberViewModel, Address>()
             .ForMember(dest => dest.BuildingNumber, opt => opt.MapFrom(src => src.BuildingNumber))

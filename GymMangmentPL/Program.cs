@@ -33,6 +33,9 @@ namespace GymMangmentPL
 
             builder.Services.AddScoped<IAnalysisService, AnalysisService>();
             builder.Services.AddScoped<IMemberService, MemberService>();
+            builder.Services.AddScoped<ITrainerService, TrainerService>();
+            builder.Services.AddScoped<IPlanService, PlanService>();
+            builder.Services.AddScoped<ISessionService, SessionService>();
 
             var app = builder.Build();
             using var scope = app.Services.CreateScope();

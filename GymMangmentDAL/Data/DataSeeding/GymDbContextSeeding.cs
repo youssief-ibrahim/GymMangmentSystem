@@ -18,7 +18,8 @@ namespace GymMangmentDAL.Data.DataSeeding
             {
                 bool HasCategories = dbContext.Categories.Any();
                 bool HasPlans = dbContext.Plans.Any();
-                if (HasCategories && HasPlans) return false;
+                bool HasTranair = dbContext.Trainers.Any();
+                if (HasCategories && HasPlans && HasTranair) return false;
 
                 if (!HasCategories)
                 {
@@ -33,6 +34,13 @@ namespace GymMangmentDAL.Data.DataSeeding
                     if (Planss.Any())
                         dbContext.Plans.AddRange(Planss);
                 }
+                if (!HasTranair)
+                {
+                    var Tranairs = LoadDataFromJsonFile<Trainer>("trainers.json");
+                    if (Tranairs.Any())
+                        dbContext.Trainers.AddRange(Tranairs);
+                }
+                
                 int RowsAffected = dbContext.SaveChanges();
                 return RowsAffected > 0;
             }

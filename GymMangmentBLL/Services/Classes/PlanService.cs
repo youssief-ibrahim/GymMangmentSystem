@@ -22,7 +22,7 @@ namespace GymMangmentBLL.Services.Classes
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
         }
-        public IEnumerable<PlanViewModel> GetAllMembers()
+        public IEnumerable<PlanViewModel> GetAllPlanss()
         {
             var plans=unitOfWork.GetRepository<Plan>().GetAll();
             if (plans == null || !plans.Any()) return [];

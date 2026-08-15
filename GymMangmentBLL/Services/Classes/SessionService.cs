@@ -30,7 +30,7 @@ namespace GymMangmentBLL.Services.Classes
             {
                 if (IsTaranerExisst(CreatedSession.TrainerId)) return false;
                 if (IsCategoryExisst(CreatedSession.CategoryId)) return false;
-                if (IsTimeValid(CreatedSession.StartDate, CreatedSession.EndDate)) return false;
+                if (!IsTimeValid(CreatedSession.StartDate, CreatedSession.EndDate)) return false;
                 if (CreatedSession.Capacity < 0 || CreatedSession.Capacity > 25) return false;
 
                 var sessionadd = mapper.Map<Session>(CreatedSession);
@@ -142,6 +142,21 @@ namespace GymMangmentBLL.Services.Classes
             
         }
 
+        public IEnumerable<TrainerSelectViewModel> GetAllTrainersFromDropDown()
+        {
+            var Trainers = unitOfWork.GetRepository<Trainer>().GetAll();
+
+            var MappedTrainers = mapper.Map<IEnumerable<TrainerSelectViewModel>>(Trainers);
+            return MappedTrainers;
+        }
+
+        public IEnumerable<CategorySelectViewModel> GetAllCategoriesFromDropDown()
+        {
+            var Categories = unitOfWork.GetRepository<Category>().GetAll();
+            var MappedCategories = mapper.Map<IEnumerable<CategorySelectViewModel>>(Categories);
+            return MappedCategories;
+        }
+
 
         #region Helper-Method
 
@@ -166,22 +181,23 @@ namespace GymMangmentBLL.Services.Classes
         }
         private bool IsSessionAvilableToDelete(Session session)
         {
-            if (session is null) return false;
+            return unitOfWork.SessionRepository.GetCountOfBookedSloute(session.Id)==0 && session.StartDate > DateTime.Now;
+            //if (session is null) return false;
 
-            if (session.EndDate <= DateTime.Now && session.EndDate>DateTime.Now)
-            {
-                return false;
-            }
-            // uocoming
-            if (session.StartDate > DateTime.Now)
-            {
-                return false;
-            }
-            var HasActiveBooking = unitOfWork.SessionRepository.GetCountOfBookedSloute(session.Id) > 0;
+            //if (session.EndDate <= DateTime.Now && session.EndDate>DateTime.Now)
+            //{
+            //    return false;
+            //}
+            //// uocoming
+            //if (session.StartDate > DateTime.Now)
+            //{
+            //    return false;
+            //}
+            //var HasActiveBooking = unitOfWork.SessionRepository.GetCountOfBookedSloute(session.Id) > 0;
 
-            if (HasActiveBooking) return false;
+            //if (HasActiveBooking) return false;
 
-            return true;
+            //return true;
         }
 
         private bool IsTaranerExisst(int TrainerId)
@@ -194,8 +210,10 @@ namespace GymMangmentBLL.Services.Classes
         }
         private bool IsTimeValid(DateTime startDate, DateTime endDate)
         {
-            return startDate < endDate;
+            return startDate < endDate && startDate>DateTime.Now;
         }
+
+      
 
 
         #endregion
